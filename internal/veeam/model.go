@@ -10,6 +10,6 @@ type licenseInfo struct {
 	Edition                 string `json:"Edition"`
 	Status                  string `json:"Status"`
 	ExpirationDate          string `json:"ExpirationDate"` // RFC3339, e.g. "2027-01-31T00:00:00Z"
-	LicensedInstancesNumber int    `json:"LicensedInstancesNumber"`
-	UsedInstancesNumber     int    `json:"UsedInstancesNumber"`
+	LicensedInstancesNumber *int   `json:"LicensedInstancesNumber"`
+	UsedInstancesNumber     *int   `json:"UsedInstancesNumber"`
 }

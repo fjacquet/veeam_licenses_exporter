@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/sirupsen/logrus"
 )
 
 // emClient is a hand-rolled Veeam Backup Enterprise Manager REST client. Session
@@ -17,7 +19,7 @@ type emClient struct {
 	token string
 }
 
-func newEMClient(host string, insecure bool) *emClient {
+func newEMClient(host string, insecure, trace bool) *emClient {
 	rc := resty.New().
 		SetBaseURL(host).
 		SetTimeout(30*time.Second).
@@ -30,6 +32,23 @@ func newEMClient(host string, insecure bool) *emClient {
 		AddRetryCondition(func(r *resty.Response, err error) bool {
 			return err != nil || r.StatusCode() >= 500
 		})
+	if trace {
+		rc.OnAfterResponse(func(_ *resty.Client, resp *resty.Response) error {
+			// Trace the repo-owned /api/licensing payload only, for live field verification.
+			// Session-management responses are never logged, so the session token
+			// (X-RestSvcSessionId header) and Basic credential are never emitted. Headers
+			// are never logged.
+			if strings.HasSuffix(resp.Request.URL, "/api/licensing") {
+				logrus.WithFields(logrus.Fields{
+					"vendor": vendor,
+					"method": resp.Request.Method,
+					"url":    resp.Request.URL,
+					"status": resp.StatusCode(),
+				}).Infof("veeam EM licensing response body: %s", string(resp.Body()))
+			}
+			return nil
+		})
+	}
 	return &emClient{rc: rc}
 }
 

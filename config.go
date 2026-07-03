@@ -14,7 +14,7 @@ type Config struct {
 
 // loadConfig parses the file and builds the sources — the single closure body
 // core.Main calls at startup and on every reload.
-func loadConfig(path string) (core.Base, []core.Source, error) {
+func loadConfig(path string, trace bool) (core.Base, []core.Source, error) {
 	var cfg Config
 	if err := core.LoadYAML(path, &cfg); err != nil {
 		return core.Base{}, nil, err
@@ -22,7 +22,7 @@ func loadConfig(path string) (core.Base, []core.Source, error) {
 	if err := cfg.Validate(); err != nil {
 		return core.Base{}, nil, err
 	}
-	sources, err := veeam.NewSources(cfg.Veeam)
+	sources, err := veeam.NewSources(cfg.Veeam, trace)
 	if err != nil {
 		return core.Base{}, nil, err
 	}

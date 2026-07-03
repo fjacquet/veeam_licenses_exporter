@@ -1,12 +1,15 @@
 package veeam
 
 import (
+	"bytes"
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	core "github.com/fjacquet/licenses-exporter-core"
+	"github.com/sirupsen/logrus"
 )
 
 // fakeEM stands up an Enterprise Manager the client can talk to: a session login
@@ -70,15 +73,37 @@ func TestSourceCollectAuthFailure(t *testing.T) {
 
 // NewSources builds one source per enabled server; disabled yields none.
 func TestNewSources(t *testing.T) {
-	got, err := NewSources(VeeamConfig{Enabled: true, Servers: []ServerConfig{{Instance: "em-a", Host: "https://em:9398", Username: "u", Password: "p"}}})
+	got, err := NewSources(VeeamConfig{Enabled: true, Servers: []ServerConfig{{Instance: "em-a", Host: "https://em:9398", Username: "u", Password: "p"}}}, false)
 	if err != nil {
 		t.Fatalf("NewSources: %v", err)
 	}
 	if len(got) != 1 || got[0].Vendor() != "veeam" || got[0].Instance() != "em-a" {
 		t.Fatalf("sources = %+v, want one veeam/em-a", got)
 	}
-	none, err := NewSources(VeeamConfig{Enabled: false})
+	none, err := NewSources(VeeamConfig{Enabled: false}, false)
 	if err != nil || none != nil {
 		t.Fatalf("disabled NewSources = %v, %v; want nil,nil", none, err)
+	}
+}
+
+func TestTraceLogsLicensingBodyNotToken(t *testing.T) {
+	srv := fakeEM(t, `{"Edition":"Enterprise Plus","ExpirationDate":"2027-01-31T00:00:00Z","LicensedInstancesNumber":100,"UsedInstancesNumber":42}`)
+	defer srv.Close()
+
+	var buf bytes.Buffer
+	old := logrus.StandardLogger().Out
+	logrus.SetOutput(&buf)
+	defer logrus.SetOutput(old)
+
+	src := &source{instance: "em-a", host: srv.URL, username: "u", password: "p", insecure: true, trace: true}
+	if _, err := src.Collect(context.Background()); err != nil {
+		t.Fatalf("Collect: %v", err)
+	}
+	out := buf.String()
+	if !strings.Contains(out, "Enterprise Plus") {
+		t.Fatalf("trace did not log the licensing body; got: %s", out)
+	}
+	if strings.Contains(out, "sess-123") {
+		t.Fatal("trace leaked the session token")
 	}
 }

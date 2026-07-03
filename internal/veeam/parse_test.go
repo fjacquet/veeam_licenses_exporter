@@ -79,3 +79,28 @@ func TestParseInvalidJSON(t *testing.T) {
 		t.Fatal("expected error on malformed JSON")
 	}
 }
+
+// Absent UsedInstancesNumber omits seats_used entirely (absent-not-zero), not a fake 0.
+func TestParseMissingUsedOmitsSeatsUsed(t *testing.T) {
+	raw := []byte(`{"Edition":"Enterprise","LicensedInstancesNumber":10}`)
+	samples, err := parseLicense(raw, "em-a")
+	if err != nil {
+		t.Fatalf("parseLicense: %v", err)
+	}
+	if _, ok := find(samples, core.MetricSeatsUsed); ok {
+		t.Fatal("seats_used must be omitted when UsedInstancesNumber is absent")
+	}
+}
+
+// An explicit 0 used-instances is a real fact and IS emitted.
+func TestParseExplicitZeroUsedEmitted(t *testing.T) {
+	raw := []byte(`{"Edition":"Enterprise","LicensedInstancesNumber":10,"UsedInstancesNumber":0}`)
+	samples, err := parseLicense(raw, "em-a")
+	if err != nil {
+		t.Fatalf("parseLicense: %v", err)
+	}
+	used, ok := find(samples, core.MetricSeatsUsed)
+	if !ok || used.Value != 0 {
+		t.Fatalf("seats_used = %+v ok=%v, want explicit 0", used, ok)
+	}
+}

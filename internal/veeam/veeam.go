@@ -7,7 +7,7 @@ import (
 )
 
 // NewSources builds one Source per configured Enterprise Manager server.
-func NewSources(cfg VeeamConfig) ([]core.Source, error) {
+func NewSources(cfg VeeamConfig, trace bool) ([]core.Source, error) {
 	if !cfg.Enabled {
 		return nil, nil
 	}
@@ -23,6 +23,7 @@ func NewSources(cfg VeeamConfig) ([]core.Source, error) {
 			username: s.Username,
 			password: pw,
 			insecure: s.InsecureSkipVerify,
+			trace:    trace,
 		})
 	}
 	return out, nil

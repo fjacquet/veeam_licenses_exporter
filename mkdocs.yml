@@ -48,4 +48,4 @@ nav:
       - 0001 Consume core, resty EM client: adr/0001-consume-core-resty-em.md
 
 extra:
-  version: v1.0.0
+  version: v0.1.0

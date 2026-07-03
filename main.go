@@ -28,7 +28,7 @@ func main() {
 				Debug:      debug,
 				Trace:      trace,
 				ConfigPath: cfgPath,
-				Load:       func() (core.Base, []core.Source, error) { return loadConfig(cfgPath) },
+				Load:       func() (core.Base, []core.Source, error) { return loadConfig(cfgPath, trace) },
 			})
 		},
 	}
@@ -36,7 +36,7 @@ func main() {
 	root.Flags().StringVar(&addr, "web.listen-address", ":9107", "metrics listen address")
 	root.Flags().BoolVar(&debug, "debug", false, "debug logging")
 	root.Flags().BoolVar(&once, "once", false, "run one collection cycle and exit")
-	root.Flags().BoolVar(&trace, "trace", false, "log repo-owned API responses (session token redacted; SDK tracing n/a)")
+	root.Flags().BoolVar(&trace, "trace", false, "log the repo-owned Enterprise Manager /api/licensing response body for live field verification (session token and credential never logged)")
 	if err := root.Execute(); err != nil {
 		logrus.WithError(err).Fatal("exporter failed")
 	}

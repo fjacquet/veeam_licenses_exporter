@@ -13,6 +13,7 @@ type source struct {
 	username string
 	password string
 	insecure bool
+	trace    bool
 }
 
 func (s *source) Vendor() string   { return vendor }
@@ -22,7 +23,7 @@ func (s *source) Instance() string { return s.instance }
 // (best-effort), and parses the result — stateless per cycle. A logout failure is
 // warned, not fatal, so operators see potential EM session leaks.
 func (s *source) Collect(ctx context.Context) ([]core.Sample, error) {
-	c := newEMClient(s.host, s.insecure)
+	c := newEMClient(s.host, s.insecure, s.trace)
 	if err := c.login(ctx, s.username, s.password); err != nil {
 		return nil, err
 	}

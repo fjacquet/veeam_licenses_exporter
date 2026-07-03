@@ -27,10 +27,12 @@ func parseLicense(raw []byte, instance string) ([]core.Sample, error) {
 		product = vendor
 	}
 	var out []core.Sample
-	if li.LicensedInstancesNumber > 0 {
-		out = append(out, core.SeatSample(core.MetricSeatsTotal, vendor, product, unit, instance, float64(li.LicensedInstancesNumber)))
+	if li.LicensedInstancesNumber != nil && *li.LicensedInstancesNumber > 0 {
+		out = append(out, core.SeatSample(core.MetricSeatsTotal, vendor, product, unit, instance, float64(*li.LicensedInstancesNumber)))
 	}
-	out = append(out, core.SeatSample(core.MetricSeatsUsed, vendor, product, unit, instance, float64(li.UsedInstancesNumber)))
+	if li.UsedInstancesNumber != nil {
+		out = append(out, core.SeatSample(core.MetricSeatsUsed, vendor, product, unit, instance, float64(*li.UsedInstancesNumber)))
+	}
 	if li.ExpirationDate != "" {
 		if t, err := time.Parse(time.RFC3339, li.ExpirationDate); err == nil {
 			out = append(out, core.ExpirationSample(vendor, product, instance, float64(t.Unix())))

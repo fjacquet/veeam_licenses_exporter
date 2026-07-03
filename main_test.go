@@ -61,7 +61,7 @@ veeam:
 	if err := os.WriteFile(path, []byte(yaml), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	base, sources, err := loadConfig(path)
+	base, sources, err := loadConfig(path, false)
 	if err != nil {
 		t.Fatalf("loadConfig: %v", err)
 	}
