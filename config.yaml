@@ -1,6 +1,7 @@
 # veeam_licenses_exporter — Veeam Backup Enterprise Manager license exporter.
 # Requires Veeam Backup Enterprise Manager (:9398) — standalone VBR has no license REST API.
-# Secrets are ${ENV} refs (expanded at load) or passwordFile paths.
+# Secrets are environment-variable refs (from the real env or a .env file,
+# expanded at load) or passwordFile paths.
 
 collection:
   interval: 2h            # how often to poll Enterprise Manager /api/licensing
