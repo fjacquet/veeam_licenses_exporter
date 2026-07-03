@@ -2,7 +2,11 @@ module github.com/fjacquet/veeam_licenses_exporter
 
 go 1.26.4
 
-require github.com/fjacquet/licenses-exporter-core v1.0.0
+require (
+	github.com/fjacquet/licenses-exporter-core v1.0.0
+	github.com/go-resty/resty/v2 v2.17.2
+	github.com/sirupsen/logrus v1.9.4
+)
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -19,7 +23,6 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/sirupsen/logrus v1.9.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.44.0 // indirect
