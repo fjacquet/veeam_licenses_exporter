@@ -15,14 +15,15 @@ import (
 type emClient struct {
 	rc    *resty.Client
 	token string
-	sid   string
 }
 
 func newEMClient(host string, insecure bool) *emClient {
 	rc := resty.New().
 		SetBaseURL(host).
 		SetTimeout(30*time.Second).
-		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: insecure}).
+		// MinVersion pinned to TLS 1.2: Enterprise Manager is commonly IIS-hosted on
+		// Windows Server and may not yet offer TLS 1.3.
+		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: insecure, MinVersion: tls.VersionTLS12}).
 		SetHeader("Accept", "application/json").
 		// Retry transport/5xx only; 4xx (auth) is never retried.
 		SetRetryCount(2).

@@ -1,0 +1,50 @@
+services:
+  veeam_licenses_exporter:
+    build: .
+    image: veeam_licenses_exporter
+    # Build-only image (no registry). Without this, `docker compose pull`/`up`
+    # tries to pull `veeam_licenses_exporter` from Docker Hub and fails with access-denied.
+    pull_policy: build
+    container_name: veeam_licenses_exporter
+    ports:
+      - "9107:9107"
+    volumes:
+      - ./config.yaml:/etc/veeam_licenses_exporter/config.yaml:ro
+    environment:
+      # Single-target quickstart credentials. config.yaml is the source of truth for
+      # which ${ENV} refs are actually consumed — env passthrough never replaces it.
+      - VEEAM_EM_HOST=${VEEAM_EM_HOST:-https://em.example.com:9398}
+      - VEEAM_USERNAME=${VEEAM_USERNAME:-svc-ro}
+      - VEEAM_PASSWORD=${VEEAM_PASSWORD:-}
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: licenses_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/prometheus/license.rules.yml:/etc/prometheus/license.rules.yml:ro
+    depends_on:
+      - veeam_licenses_exporter
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: licenses_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      # Test-stack credentials (admin / admin by default). Change for anything non-local.
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      # Datasource + dashboard providers (auto-provisioned on startup).
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      # Bundled dashboard(s), auto-loaded by the file provider.
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped

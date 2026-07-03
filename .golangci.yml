@@ -1,0 +1,42 @@
+version: "2"
+
+linters:
+  enable:
+    - gosec
+    - revive
+    - misspell
+    - unconvert
+  settings:
+    revive:
+      # Keep revive's default rule set active but drop the two doc-comment
+      # rules: the exporter shipped without exported/package comments
+      # repo-wide, and this build-tooling task is scoped to
+      # Makefile/Dockerfile/GoReleaser/lint config only (no .go changes).
+      # Re-enable once a documentation pass adds the missing comments.
+      enable-default-rules: true
+      rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+  exclusions:
+    rules:
+      # No G304 exclusions needed: all operator-supplied file reads (the --config
+      # file and passwordFile secret refs) now funnel through
+      # licenses-exporter-core, not this repo.
+      # Test mocks intentionally write static fixtures to ResponseWriter; test
+      # signatures keep the standard (t *testing.T) param even when unused.
+      - path: _test\.go
+        linters: [gosec, revive]
+      # cobra's RunE signature is func(cmd *cobra.Command, args []string) error;
+      # this handler only needs args, but cmd stays in the signature to satisfy
+      # the interface.
+      - path: main.go
+        linters: [revive]
+        text: "unused-parameter"
+      # G402 (TLS InsecureSkipVerify may be true): operator-opt-in escape hatch for
+      # self-signed Enterprise Manager certs, gated by config.yaml's
+      # insecureSkipVerify (default false) — never a hardcoded bypass.
+      - path: internal/veeam/client\.go
+        linters: [gosec]
+        text: "G402"

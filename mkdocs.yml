@@ -1,0 +1,51 @@
+site_name: veeam_licenses_exporter
+site_description: Veeam Backup Enterprise Manager license Prometheus + OTLP exporter, built on licenses-exporter-core
+site_url: https://fjacquet.github.io/veeam_licenses_exporter/
+repo_url: https://github.com/fjacquet/veeam_licenses_exporter
+repo_name: fjacquet/veeam_licenses_exporter
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+
+nav:
+  - Metrics Reference: metrics.md
+  - Deployment:
+      - Docker: deployment/docker.md
+  - Dashboards: dashboards.md
+  - Architecture Decisions:
+      - Overview: adr/index.md
+      - 0001 Consume core, resty EM client: adr/0001-consume-core-resty-em.md
+
+extra:
+  version: v1.0.0
