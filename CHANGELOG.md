@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-07-10
+
+### Security
+- Bump Go toolchain to `go 1.26.5` to patch **GO-2026-5856** (`crypto/tls`), reported by
+  `govulncheck` / `make ci`.
+
+### Added
+- First multi-arch (`linux/amd64`, `linux/arm64`) GHCR container image publishing via
+  GoReleaser `dockers_v2` — `ghcr.io/fjacquet/veeam_licenses_exporter` (tags `{version}`,
+  `{major}.{minor}`, and `latest` on non-prerelease), with per-image CycloneDX SBOM.
+
+## [0.1.0] - 2026-07-03
+
 ### Added
 - Initial release: a Veeam license exporter reading the Veeam Backup Enterprise Manager
   REST API (`:9398`, session auth → `GET /api/licensing`) via a hand-rolled resty client,
