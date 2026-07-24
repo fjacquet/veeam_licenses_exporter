@@ -3,7 +3,7 @@ module github.com/fjacquet/veeam_licenses_exporter
 go 1.26.5
 
 require (
-	github.com/fjacquet/licenses-exporter-core v1.0.0
+	github.com/fjacquet/licenses-exporter-core v1.0.1
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.10.2
