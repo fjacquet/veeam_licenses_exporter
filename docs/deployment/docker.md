@@ -1,8 +1,11 @@
 # Docker deployment
 
-The image (`Dockerfile`) is a non-root, multi-stage Alpine build: it runs as the
-unprivileged `licenses` user (uid `10001`), listens on `9107`, and reads `config.yaml` from
-`/etc/veeam_licenses_exporter/config.yaml`.
+Both images are non-root Alpine builds running as the unprivileged `licenses`
+user (uid `10001`), listening on `9107` and reading `config.yaml` from
+`/etc/veeam_licenses_exporter/config.yaml`. `Dockerfile` is the multi-stage build
+from source; `Dockerfile.goreleaser` is the release image published to GHCR,
+which copies the prebuilt binary. Published images before the ADR-0002 release
+were `gcr.io/distroless/static:nonroot` at uid `65532`.
 
 !!! warning "Requires Veeam Backup Enterprise Manager"
     This exporter reads license data exclusively from the **Veeam Backup Enterprise
@@ -27,9 +30,21 @@ fast at load with `config references unset environment variable "..."`. Secrets 
 alternatively be supplied as a file via `passwordFile` in `config.yaml`, mounted as a
 read-only volume instead of passed as an env var.
 
-`/metrics` and `/health` are both served on `9107`; `/health` returns HTTP 200 with
-`starting` until the first collection cycle completes for every enabled Enterprise Manager,
-then `ok`.
+Four routes are served on `9107`:
+
+| Path | Status | Body |
+|---|---|---|
+| `/metrics` | 200 | Prometheus exposition |
+| `/health` | always 200 | `starting` until the first collection cycle completes for every enabled Enterprise Manager, then `ok` |
+| `/livez` | always 200 | empty |
+| `/readyz` | always 200 | empty |
+
+Point Kubernetes probes and container healthchecks at `/livez` and `/readyz` —
+never at `/metrics`, which renders the whole exposition per probe tick and can
+block behind a slow collection cycle. Both Dockerfiles ship a `HEALTHCHECK`
+against `http://127.0.0.1:9107/livez` (`127.0.0.1`, not `localhost`: busybox
+`wget` tries `::1` first and the exporter binds IPv4 only), and both compose
+files carry the matching `healthcheck:`.
 
 ## One-command demo stack (Compose)
 
