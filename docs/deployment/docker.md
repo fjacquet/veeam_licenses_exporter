@@ -46,6 +46,12 @@ against `http://127.0.0.1:9107/livez` (`127.0.0.1`, not `localhost`: busybox
 `wget` tries `::1` first and the exporter binds IPv4 only), and both compose
 files carry the matching `healthcheck:`.
 
+`/metrics` also accepts one or more `name[]` query parameters to return only the
+named metric families (e.g. `/metrics?name[]=license_up`), per the standard
+[Prometheus `promhttp` filtering behavior](https://pkg.go.dev/github.com/prometheus/client_golang/prometheus/promhttp#HandlerFor).
+A request with no `name[]` parameter is unaffected and returns the full
+exposition as before.
+
 ## One-command demo stack (Compose)
 
 ```bash

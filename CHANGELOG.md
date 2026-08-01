@@ -13,9 +13,14 @@ All notable changes to this project are documented here. The format is based on
   exporter family. Anyone pinning the container uid — a `securityContext.runAsUser`,
   ownership on a mounted secret or log volume — must update it. See ADR-0002.
 
+### Security
+- Bump `licenses-exporter-core` to v1.1.1, carrying the upstream `grpc`
+  v1.82.0 → v1.83.0 fix for **GO-2026-6061**, a reachable vulnerability.
+  Documentation-only release vs v1.1.0; no code changes in this repo.
+
 ### Added
 - **`/livez` and `/readyz`**, both always 200 and reading no state, via
-  `licenses-exporter-core` v1.1.0. Point Kubernetes probes and container
+  `licenses-exporter-core` v1.1.1. Point Kubernetes probes and container
   healthchecks at these, never at `/metrics`.
 - **`HEALTHCHECK`** against `http://127.0.0.1:9107/livez` in both `Dockerfile` and
   `Dockerfile.goreleaser`, and a matching `healthcheck:` in `docker-compose.yml`
@@ -28,6 +33,13 @@ All notable changes to this project are documented here. The format is based on
   cycle completed, which restarted healthy pods under a `livenessProbe` and
   reported containers unhealthy for the whole start-up window. Anything asserting
   a 503 from `/health` must be updated.
+- **`/metrics` now accepts `name[]` query parameters** for metric filtering, via
+  the `prometheus/client_golang` v1.23.2 → v1.24.1 bump pulled in by
+  `licenses-exporter-core` v1.1.1. Requests with no `name[]` parameter are
+  unaffected. Note for operators: `client_golang` 1.24 also always enforces
+  UTF-8 metric-name validation rather than the legacy scheme; neither this repo
+  nor `licenses-exporter-core` sets `model.NameValidationScheme`, so there is no
+  observable behavior change here.
 
 ## [0.1.2] - 2026-07-10
 
