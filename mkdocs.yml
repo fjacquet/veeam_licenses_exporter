@@ -46,6 +46,7 @@ nav:
   - Architecture Decisions:
       - Overview: adr/index.md
       - 0001 Consume core, resty EM client: adr/0001-consume-core-resty-em.md
+      - 0002 /livez + /readyz probes, Alpine release image: adr/0002-livez-readyz-probes-and-alpine-release-image.md
 
 extra:
   version: v0.1.0

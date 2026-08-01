@@ -53,6 +53,7 @@ each Enterprise Manager's first collection cycle resolves. See
 make cli
 ./bin/veeam_licenses_exporter --config config.yaml
 # metrics: http://localhost:9107/metrics   health: http://localhost:9107/health
+# probes:  http://localhost:9107/livez     http://localhost:9107/readyz  (always 200)
 ```
 
 Useful flags: `--once --debug` runs a single collection cycle and dumps every collected
