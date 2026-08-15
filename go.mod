@@ -1,6 +1,6 @@
 module github.com/fjacquet/veeam_licenses_exporter
 
-go 1.26.5
+go 1.26.6
 
 require (
 	github.com/fjacquet/licenses-exporter-core v1.1.1
