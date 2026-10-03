@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-10-03
+
+### Changed
+
+- Go toolchain moved to 1.27.1.
+- `golangci-lint` pin bumped v2.12.2 -> v2.13.2 and `goreleaser` v2.16.0 -> v2.18.0.
+- Dependency refresh (`go get -u ./...`).
+
 ## [0.3.3] - 2026-09-13
 
 ### Security
